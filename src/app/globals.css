@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/figtree";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Palette — Pondicherry after dark.
+ * Each accent has one meaning everywhere in the app:
+ *   revenue = bougainvillea, expense = coral, profit = lagoon teal,
+ *   manager share = Pondy ochre, investors = periwinkle.
+ */
+:root {
+  --bg: #eef1fa;
+  --ink: #151935;
+  --muted: #5b6285;
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.82);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --line: rgba(21, 25, 53, 0.09);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 18px 40px -22px rgba(40, 46, 110, 0.35);
+  --slab-edge: #c9cfe6;
+
+  --revenue: #d93a72;
+  --expense: #e2524f;
+  --profit: #0f8f86;
+  --manager: #d98c16;
+  --investor: #5c6cf0;
+}
+
+.dark {
+  --bg: #0f1330;
+  --ink: #eef0ff;
+  --muted: #a0a7cf;
+  --glass: rgba(30, 36, 80, 0.5);
+  --glass-strong: rgba(34, 40, 88, 0.86);
+  --glass-edge: rgba(255, 255, 255, 0.09);
+  --line: rgba(255, 255, 255, 0.08);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 24px 50px -24px rgba(0, 0, 0, 0.7);
+  --slab-edge: #262c5e;
+
+  --revenue: #f0629a;
+  --expense: #f47a77;
+  --profit: #2cc4b6;
+  --manager: #f6b54d;
+  --investor: #8f9bff;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-line: var(--line);
+  --color-revenue: var(--revenue);
+  --color-expense: var(--expense);
+  --color-profit: var(--profit);
+  --color-manager: var(--manager);
+  --color-investor: var(--investor);
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Money and headings: Bricolage, with figures that line up in columns. */
+.font-display,
+.num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-optical-sizing: auto;
+}
+.num {
+  letter-spacing: -0.01em;
+}
+
+/* Frosted glass surface. Hierarchy comes from radius + blur, not identical cards. */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+.glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+}
+
+/* The single ambient motion: slow aurora drift behind the glass. */
+.aurora span {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.dark .aurora span {
+  opacity: 0.42;
+}
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(6vw, -4vh, 0) scale(1.12); }
+  100% { transform: translate3d(-4vw, 5vh, 0) scale(0.95); }
+}
+
+/* Building slab — the room board's floors. */
+.slab {
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-edge);
+  box-shadow: 0 10px 0 -2px var(--slab-edge), 0 22px 30px -18px rgba(20, 24, 60, 0.45);
+}
+
+:focus-visible {
+  outline: 2px solid var(--investor);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora span {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print,
+  .aurora {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .glass,
+  .glass-strong {
+    background: #fff !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border-color: #ddd !important;
+  }
+  .print-full {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
