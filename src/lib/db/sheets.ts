@@ -16,8 +16,9 @@ import type { Driver, RawRow, WriteRow } from "./driver";
 const CACHE_TTL_MS = 5_000;
 
 function getClient(): sheets_v4.Sheets {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  // Accept the key with literal \n sequences or real line breaks, with or without wrapping quotes.
+  const key = process.env.GOOGLE_PRIVATE_KEY?.trim().replace(/^"|"$/g, "").replace(/\\n/g, "\n");
   if (!email || !key) {
     throw new Error(
       "Google Sheets is not configured. Set GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY, or use DB_DRIVER=local for development.",
@@ -59,8 +60,10 @@ export class SheetsDriver implements Driver {
   private headers = new Map<TabName, string[]>();
 
   constructor() {
-    const id = process.env.GOOGLE_SHEET_ID;
-    if (!id) throw new Error("GOOGLE_SHEET_ID is not set.");
+    const raw = (process.env.GOOGLE_SHEET_ID ?? "").trim();
+    // Accept either the bare ID or the full sheet URL.
+    const id = raw.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] ?? raw;
+    if (!id) throw new Error("GOOGLE_SHEET_ID is not set. Add it in Vercel → Settings → Environment Variables, then redeploy.");
     this.spreadsheetId = id;
   }
 

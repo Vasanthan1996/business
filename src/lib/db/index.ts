@@ -10,7 +10,13 @@ let driver: Driver | null = null;
 
 export async function getDriver(): Promise<Driver> {
   if (driver) return driver;
-  const kind = process.env.DB_DRIVER ?? (process.env.GOOGLE_SHEET_ID ? "sheets" : "local");
+  const kind = (process.env.DB_DRIVER ?? (process.env.GOOGLE_SHEET_ID ? "sheets" : "local")).trim().toLowerCase();
+  if (kind !== "sheets" && process.env.VERCEL) {
+    // Never fall back to the empty local test database in production.
+    throw new Error(
+      "The database isn't connected. In Vercel → Settings → Environment Variables, set DB_DRIVER to sheets and add GOOGLE_SHEET_ID, then redeploy.",
+    );
+  }
   if (kind === "sheets") {
     const { SheetsDriver } = await import("./sheets");
     driver = new SheetsDriver();
